@@ -1,3 +1,4 @@
+import processing.serial.*;
 boolean debugging = false;
 int slide_timeout = 86000;
 int slide_started = millis();
@@ -5,6 +6,7 @@ boolean slideshow_on = false;
 ArrayList<Pic> pics = new ArrayList<Pic>();
 int index = 0;
 float aspect_ratio;
+Serial myPort;
 void setup() {
   size(displayWidth, displayHeight);
   background(0);
@@ -17,8 +19,19 @@ void setup() {
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2332792/1406469-8.jpg"));
   fill(255);
   if (debugging) slide_timeout = 5000;
+  String portName = Serial.list()[2];
+  for (int i=0; i<Serial.list().length; i++) {
+    println(i + " " + Serial.list()[i]);
+  }
+  myPort = new Serial(this, portName, 9600);
 }
 void draw() {
+  int serialVal = 65535;
+  if ( myPort.available() > 0) {  // If data is available,
+    serialVal = myPort.read();
+    if (debugging) println(serialVal);
+    if ((int)serialVal == 1) turn_slideshow_on();
+  }
   background(0);
   for (int i = pics.size() - 1; i >= 0; i--) {
     if (slideshow_on == true) {
@@ -75,8 +88,32 @@ void turn_slideshow_on() {
   }
 }
 void mouseClicked() {
-  turn_slideshow_on();
+  //turn_slideshow_on();
 }
 void keyPressed() {
-  turn_slideshow_on();
+  //turn_slideshow_on();
 }
+
+/*
+ // Arduino code for a pushbutton on pullup on pin 7
+ int inPin = 7;
+ void setup() {
+ pinMode(LED_BUILTIN, OUTPUT);
+ pinMode(inPin, INPUT);
+ Serial.begin(9600);
+ while (!Serial) {
+ ; // wait for serial port to connect.
+ }
+ }
+ void loop() {
+ int val = digitalRead(inPin);
+ if (val == HIGH) {
+ digitalWrite(LED_BUILTIN, LOW);
+ Serial.write(0);
+ } else {
+ digitalWrite(LED_BUILTIN, HIGH);
+ Serial.write(1);
+ }
+ delay(100);
+ }
+ */
