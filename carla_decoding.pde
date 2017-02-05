@@ -1,7 +1,10 @@
+boolean debugging = false;
+int slide_timeout = 86000;
+int slide_started = millis();
+boolean slideshow_on = false;
 ArrayList<Pic> pics = new ArrayList<Pic>();
 int index = 0;
 float aspect_ratio;
-float alpha_step = 0.5;
 void setup() {
   size(displayWidth, displayHeight);
   background(0);
@@ -12,20 +15,36 @@ void setup() {
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2327916/1402725-8.jpg"));
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2332766/1406448-8.jpg"));
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2332792/1406469-8.jpg"));
+  fill(255);
+  if (debugging) slide_timeout = 5000;
 }
 void draw() {
   background(0);
   for (int i = pics.size() - 1; i >= 0; i--) {
-    tint(255, pics.get(i).alpha);
-    image(pics.get(i).img, pics.get(i).x, pics.get(i).y);
-    if (i == index) {
-      if (pics.get(i).alpha < 255) pics.get(i).alpha += alpha_step;
-    } else {
-      if (pics.get(i).alpha > 0) pics.get(i).alpha -= alpha_step;
+    if (slideshow_on == true) {
+      tint(255, pics.get(i).alpha);
+      image(pics.get(i).img, pics.get(i).x, pics.get(i).y);
+      if (i == index) {
+        pics.get(i).alpha = (int)map(millis() - slide_started, 0, slide_timeout / 2, 0, 255);
+      } else if (index == i + 1) {
+        pics.get(i).alpha = (int)map(millis() - slide_started, 0, slide_timeout / 2, 255, 0);
+      }
+      if (pics.get(i).alpha >= 255) {
+        index = (index + 1);
+        if (pics.get(i).alpha > 255) pics.get(i).alpha = 255;
+        slide_started = millis();
+      }
     }
-    fill(255);
-    text(pics.get(i).alpha, 10, 20 * (1 + i));
-    if (pics.get(i).alpha >= 255) index = (index + 1) % pics.size();
+    if (debugging) text(i + ".alpha: " + (int)pics.get(i).alpha, 10, 20 * (1 + i));
+  }
+  if (index == pics.size() && pics.get(pics.size() - 1).alpha <= 0) {
+    slideshow_on = false;
+  }
+  if (debugging) {
+    text("slideshow: " + slideshow_on, 10, 20 * (pics.size() + 1));
+    text("index: " + index, 10, 20 * (pics.size() + 2));
+    text("slide: " + (millis() - slide_started)/1000 + "s", 10, 20 * (pics.size() + 3));
+    text("total: " + millis() / 1000 + "s", 10, 20 * (pics.size() + 4));
   }
 }
 class Pic {
@@ -47,4 +66,17 @@ class Pic {
       y = 0;
     }
   }
+}
+void turn_slideshow_on() {
+  if (slideshow_on == false) {
+    slideshow_on = true;
+    index = 0;
+    slide_started = millis();
+  }
+}
+void mouseClicked() {
+  turn_slideshow_on();
+}
+void keyPressed() {
+  turn_slideshow_on();
 }
