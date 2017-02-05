@@ -9,7 +9,6 @@ float aspect_ratio;
 Serial myPort;
 void setup() {
   size(displayWidth, displayHeight);
-  background(0);
   aspect_ratio = (float)displayWidth / (float)displayHeight;
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2499115/1569111-GXYWWXGB-8.jpg"));
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2327903/1402717-8.jpg"));
@@ -17,6 +16,7 @@ void setup() {
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2327916/1402725-8.jpg"));
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2332766/1406448-8.jpg"));
   pics.add(new Pic("http://saimg-a.akamaihd.net/saatchi/727700/art/2332792/1406469-8.jpg"));
+  background(0);
   fill(255);
   if (debugging) slide_timeout = 5000;
   String portName = Serial.list()[2];
